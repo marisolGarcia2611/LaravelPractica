@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 class ProductsController extends Controller
 {
     /**
@@ -22,6 +23,41 @@ class ProductsController extends Controller
     $products=products::all();
     return response()->json($products);   
    }
+
+   ///funcion que permita añadir más registros.
+   public function insertar(Request $request)
+   {
+        $prod=new products;
+        $prod->name=$request->name;
+        $prod->precio=$request->precio;
+        $descripcion->descripcion=$request->descripcion;
+        $prod->save();
+        return 'Nuevo registro establecido';
+   }
+
+////funcion que permita mostrar los cierto rango de precios entre los productos con sus comentarios
+   public function relacionPrecio(Request $request)
+   {
+       $products=DB::table('products')
+       ->join('coments','coments.product_id','=','products.id')
+       ->where('products.name','=',$request->name)
+       ->and('products.precio')
+       ->between($request->costo1)
+       ->and($request->costo2)
+       ->select('products.name','products.precio','coments.mensaje');
+       return($products);      
+   }
+///eliminar registro de la tabla productos
+   public function eliminar(Request $request)
+   {
+       $products=DB::table('products')
+       ->join('coments','coments.product_id','=','products.id')
+       ->where('products.name','=',$request->name)
+       ->and('products.id','=','coments.product_id')
+       ->delete();
+       return 'Eliminacion de registros exitosa';      
+   }
+
 
     /**
      * Show the form for creating a new resource.

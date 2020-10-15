@@ -13,13 +13,13 @@ class ComentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-      public function index()
-    {
-      $inicio=coment::all()->toArray();
+     // public function index()
+    //{
+     // $inicio=coment::all()->toArray();
      //return view('welcome',["inicio"=>$inicio]);
-     
-      
-   }
+       
+  // }
+
 
    public function vista()
    {
@@ -28,19 +28,41 @@ class ComentController extends Controller
    }
 
 
-
-    public function ver(Request $request,int $id=null)
+///funcion que permita añadir más registros.
+    public function insertar(Request $request)
     {
-        $comnets=DB::table('coments')->where('product_id',1)->first();
-        return response()->json([
-                            
-                                "coments"=>$coments->mensaje,
-                                "id"=>$id,
-                                "request"=>$request->all(),
-                                "mensaje"=>$request->mensaje,
-                                "pro_precio"=>"El precio es: ".$request->pro_precio,
-                                "product_id"=>$request->product_id],200);
+         $coments=new coment;
+         $coments->mensaje=$request->mensaje;
+         $coments->product_id=$request->id;
+         $coments->save();
+         return 'Nuevo registro establecido';
     }
+
+////funcion que permita mostrar la relación de a que producto se le esta comentando
+    public function relacion(Request $request)
+    {
+        $coments=DB::table('coments')
+        ->join('products','coments.product_id','=','products.id')
+        ->where('products.name','=',$request->name)
+        ->select('products.name','coments.mensaje','products.precio')
+        ->get();
+        return($coments);      
+    }
+
+    ///eliminar registro de la tabla productos
+    public function eliminar(Request $request)
+    {
+        $coments=DB::table('coments')
+        ->from('coments')
+        ->where('coments.id','=',$request->id)
+        ->delete();
+        return 'Eliminacion de registros exitosa';       
+    }
+
+
+
+
+
     /**
      * Show the form for creating a new resource.
      *
